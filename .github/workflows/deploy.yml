@@ -58,10 +58,12 @@ jobs:
         echo "BASTION_IP=$BASTION_IP" >> $GITHUB_ENV
 
     - name: 2. 앤서블용 파이썬 라이브러리 설치 (추가)
+      working-directory: ./ansible-project
       run: | 
-        python3 -m pip install boto3 botcore
+        python3 -m pip install boto3 botocore
 
     - name: 3. EC2 SSH 접속을 위한 비밀키 러너 내부 파일로 생성
+      working-directory: ./ansible-project
       run: |  
         echo "${{ secrets.AWS_EC2_PRIVATE_KEY }}" > ansible-project/tf_keypair.pem
         chmod 600 ansible-project/tf_keypair.pem
