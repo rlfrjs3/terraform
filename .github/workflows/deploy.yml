@@ -54,7 +54,7 @@ jobs:
     - name: 1. BASTION_IP 추출 및 환경변수 저장
       working-directory: ./ansible-project
       run: |   
-        BASTION_IP=$(terraform ouput -raw bastionhost_public_ip)
+        BASTION_IP=$(terraform output -raw bastionhost_public_ip)
         echo "BASTION_IP=$BASTION_IP" >> $GITHUB_ENV
 
     - name: 2. 앤서블용 파이썬 라이브러리 설치 (추가)
