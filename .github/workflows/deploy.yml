@@ -65,8 +65,8 @@ jobs:
     - name: 3. EC2 SSH 접속을 위한 비밀키 러너 내부 파일로 생성
       working-directory: ./ansible-project
       run: |  
-        echo "${{ secrets.AWS_EC2_PRIVATE_KEY }}" > ansible-project/tf_keypair.pem
-        chmod 600 ansible-project/tf_keypair.pem
+        echo "${{ secrets.AWS_EC2_PRIVATE_KEY }}" > ansible-project/iac_keypair.pem
+        chmod 600 ansible-project/iac_keypair.pem
 
     - name: 4. ansible_ci.cfg에 배스천호스트의 공인ip 주입
       working-directory: ./ansible-project 
