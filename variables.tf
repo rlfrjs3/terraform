@@ -9,8 +9,8 @@ variable "private_subnet_cidrs" { type = list(string) }
 #EC2 
 variable "ami_id" { type = string }
 variable "instance_type" { type = string }
-variable "key_name" { type = string } 
+variable "key_name" { type = string }
 
 #route53
-variable "domain_name" { type = string } 
+variable "domain_name" { type = string }
 
