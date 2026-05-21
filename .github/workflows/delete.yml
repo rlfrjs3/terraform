@@ -1,0 +1,36 @@
+name: AWS Infrastructure Destroy (인프라 완전 삭제)
+
+# 코드가 push될 때는 절대 돌지 않고, 오직 깃허브 웹에서 버튼을 눌렀을 때만 실행됩니다.
+on:
+  workflow_dispatch:
+
+jobs:
+  destroy-infra:
+    name: Terraform Destroy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. 코드가져오기 (Checkout)
+        uses: actions/checkout@v4
+
+      - name: 2. AWS 인증 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: 3. 테라폼 CLI 설치
+        uses: hashicorp/setup-terraform@v3
+
+      - name: 4. 테라폼 초기화 (Init)
+        working-directory: ./terraform-project
+        run: terraform init
+
+      - name: 5. 테라폼 삭제 계획 확인 (Destroy Plan)
+        working-directory: ./terraform-project
+        run: terraform plan -destroy
+
+      - name: 6. 🔥 AWS 리소스 및 도메인 전체 삭제 (Destroy)
+        working-directory: ./terraform-project
+        run: terraform destroy --auto-approve
