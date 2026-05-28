@@ -9,7 +9,7 @@ terraform {
   }
 
   backend "local" {
-    path    = "./terraform.state"
+    path    = "./terraform.tfstate"
   }
 
 #  backend "s3" {
