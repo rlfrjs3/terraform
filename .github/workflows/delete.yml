@@ -24,10 +24,13 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: 4. 테라폼 초기화 (Init)
+        working-directory: ./terraform-project
         run: terraform init
 
       - name: 5. 테라폼 삭제 계획 확인 (Destroy Plan)
+        working-directory: ./terraform-project
         run: terraform plan -destroy
 
       - name: 6. 🔥 AWS 리소스 및 도메인 전체 삭제 (Destroy)
+        working-directory: ./terraform-project
         run: terraform destroy --auto-approve
