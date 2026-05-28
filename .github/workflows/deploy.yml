@@ -51,31 +51,31 @@ jobs:
 
 
 ### 앤서블 관련 작업 ###
-    - name: 1. BASTION_IP 추출 및 환경변수 저장
-      working-directory: ./ansible-project
-      run: |   
-        BASTION_IP=$(terraform output -raw bastionhost_public_ip)
-        echo "BASTION_IP=$BASTION_IP" >> $GITHUB_ENV
-
-    - name: 2. 앤서블용 파이썬 라이브러리 설치 (추가)
-      working-directory: ./ansible-project
-      run: | 
-        python3 -m pip install boto3 botocore
-
-    - name: 3. EC2 SSH 접속을 위한 비밀키 러너 내부 파일로 생성
-      working-directory: ./ansible-project
-      run: |  
-        echo "${{ secrets.AWS_EC2_PRIVATE_KEY }}" > ansible-project/iac_keypair.pem
-        chmod 600 ansible-project/iac_keypair.pem
-
-    - name: 4. ansible_ci.cfg에 배스천호스트의 공인ip 주입
-      working-directory: ./ansible-project 
-      run: |
-        sed -i "s/BASTION_IP_PLACEHOLDER/${{ env.BASTION_IP }}/g" ansible_ci.cfg
-
-    - name: 5. 플레이북 실행 
-      working-directory: ./ansible-project
-      run: | 
-        export ANSIBLE_CONFIG="./ansible_ci.cfg"
-        ansible-playbook playbook/first_setting.yml
+#    - name: 1. BASTION_IP 추출 및 환경변수 저장
+#      working-directory: ./ansible-project
+#      run: |   
+#        BASTION_IP=$(terraform output -raw bastionhost_public_ip)
+#        echo "BASTION_IP=$BASTION_IP" >> $GITHUB_ENV
+#
+#    - name: 2. 앤서블용 파이썬 라이브러리 설치 (추가)
+#      working-directory: ./ansible-project
+#      run: | 
+#        python3 -m pip install boto3 botocore
+#
+#    - name: 3. EC2 SSH 접속을 위한 비밀키 러너 내부 파일로 생성
+#      working-directory: ./ansible-project
+#      run: |  
+#        echo "${{ secrets.AWS_EC2_PRIVATE_KEY }}" > ansible-project/iac_keypair.pem
+#        chmod 600 ansible-project/iac_keypair.pem
+#
+#    - name: 4. ansible_ci.cfg에 배스천호스트의 공인ip 주입
+#      working-directory: ./ansible-project 
+#      run: |
+#        sed -i "s/BASTION_IP_PLACEHOLDER/${{ env.BASTION_IP }}/g" ansible_ci.cfg
+#
+#    - name: 5. 플레이북 실행 
+#      working-directory: ./ansible-project
+#      run: | 
+#        export ANSIBLE_CONFIG="./ansible_ci.cfg"
+#        ansible-playbook playbook/first_setting.yml
 

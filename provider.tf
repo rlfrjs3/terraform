@@ -8,13 +8,17 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket  = "tf-project-backend"
-    key     = "terraform-project/stephane/terraform.tfstate"
-    region  = "ap-northeast-2"
-    encrypt = true
-    #dynamodb_table = "" 
+  backend "local" {
+    path    = "./terraform.state"
   }
+
+#  backend "s3" {
+#    bucket  = "tf-project-backend"
+#    key     = "terraform-project/stephane/terraform.tfstate"
+#    region  = "ap-northeast-2"
+#    encrypt = true
+#    #dynamodb_table = "" 
+#  }
 }
 
 
