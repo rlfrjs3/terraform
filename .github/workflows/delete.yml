@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: 1. 코드가져오기 (Checkout)
         uses: actions/checkout@v4
+        with:
+          path: "terraform-project" 
 
       - name: 2. AWS 인증 설정
         uses: aws-actions/configure-aws-credentials@v4
