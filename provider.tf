@@ -7,16 +7,16 @@ terraform {
       version = ">= 6.0"
     }
   }
-}
 
-#  backend "s3" {
-#    bucket  = "tf-project-backend"
-#    key     = "terraform-project/stephane/terraform.tfstate"
-#    region  = "ap-northeast-2"
-#    encrypt = true
-#    #dynamodb_table = "" 
-#  }
-#}
+
+  backend "s3" {
+    bucket  = "tf-project-backend"
+    key     = "terraform-project/stephane/terraform.tfstate"
+    region  = "ap-northeast-2"
+    encrypt = true
+    #dynamodb_table = "" 
+  }
+}
 
 
 #참고 : 매일 클라우드 서비스들이 업데이트되기 때문에 그에 맞게 hashicorp에서도 프로바이더 버전을 업그레이드 하는 것 
