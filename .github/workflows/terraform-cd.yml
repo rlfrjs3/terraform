@@ -44,11 +44,11 @@ jobs:
 
 #테라폼 배포 (apply 버튼 누를 시)
     - name: 1. terraform plan
-      if: ${{ github.event.inputs.action_type == 'apply' }}
+      if: ${{ github.event.inputs.actions_type == 'apply' }}
       run: terraform plan -out=apply_plan
 
     - name: 2. terraform apply
-      if: ${{ github.event.inputs.action_type == 'apply' }}
+      if: ${{ github.event.inputs.actions_type == 'apply' }}
       run: terraform apply --auto-approve apply_plan
 
 
@@ -56,9 +56,9 @@ jobs:
 
 #테라폼 삭제 (destroy 버튼 누를 시)
     - name: 1. terraform plan
-      if: ${{ github.event.inputs.action_type == 'destroy' }}
+      if: ${{ github.event.inputs.actions_type == 'destroy' }}
       run: terraform plan -destroy -out=destroy_plan
 
     - name: 2. terraform destroy
-      if: ${{ github.event.inputs.action_type == 'destroy' }}
+      if: ${{ github.event.inputs.actions_type == 'destroy' }}
       run: terraform apply --auto-approve destroy_plan
