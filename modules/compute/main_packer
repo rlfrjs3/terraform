@@ -1,3 +1,20 @@
+###<AMI>
+data "aws_ami" "latest_packer_ami" {
+  most_recent = true
+  owners      = ["self"]
+
+  filter {
+    name   = "name"
+    values = ["my-webserver-ami-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+
 ###<EFS>
 #EFS 파일시스템 생성 (프라이빗 서브넷 배치)
 resource "aws_efs_file_system" "web-efs" {
@@ -20,7 +37,7 @@ resource "aws_efs_mount_target" "web-efs-mt" {
 #시작 템플릿
 resource "aws_launch_template" "web" {
   name                   = "${var.project_name}-launch-template"
-  image_id               = var.ami_id
+  image_id               = data.aws_ami.latest_packer_ami.id
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [var.web_sg_id]
@@ -29,11 +46,7 @@ resource "aws_launch_template" "web" {
 
   user_data = base64encode(<<EOT
 #!/bin/bash
-yum -y update && yum -y install httpd
 yum -y install amazon-efs-utils
-systemctl enable --now httpd
-echo "<h1>Welcome to My Web Server</h1>" > /var/www/html/index.html
-
 mkdir -p /data/efs
 echo "${aws_efs_file_system.web-efs.id}:/ /data/efs efs defaults,_netdev,nofail 0 0" >> /etc/fstab
 for i in {1..12}; do 
@@ -63,11 +76,20 @@ resource "aws_autoscaling_group" "web_asg" {
   vpc_zone_identifier       = var.private_subnet_ids           #프라이빗 서브넷에만 생성
   health_check_type         = "ELB"                            #웹서버 80포트 응답 없으면 삭제하고 재생성
   health_check_grace_period = 300
-  #instance_refresh { strategy = "Rolling" }              #시작템플릿 설정이 바뀐다면 기존 인스턴스 종료하고 다시 생성
+
   launch_template {
     id      = aws_launch_template.web.id
     version = "$Latest"
   }
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
+    triggers = ["launch_template"]
+  }
+
   tag {
     key                 = "Name"
     value               = "${var.project_name}-web-server"
