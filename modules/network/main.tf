@@ -40,7 +40,7 @@ resource "aws_subnet" "private" {
 resource "aws_internet_gateway" "tf-igw" {
   vpc_id = aws_vpc.tf-vpc.id
 
-  tags = { Nmae = "${var.project_name}-igw}" }
+  tags = { Name = "${var.project_name}-igw}" }
 }
 
 
@@ -76,8 +76,7 @@ resource "aws_nat_gateway" "nat_gateway" {
 
 
 ###<라우팅테이블>
-
-#퍼블릭 라우팅테이블
+#퍼블릭 라우팅테이블    (외부로 나갈때는 IGW를 통하도록 설정)
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.tf-vpc.id
   route {
@@ -95,7 +94,8 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-#프라이빗 라우팅테이블
+
+#프라이빗 라우팅테이블 (외부로 나갈때는 NAT GW를 통하도록 설정)
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.tf-vpc.id
   route {
@@ -128,7 +128,7 @@ resource "aws_security_group" "web" {
     protocol        = "tcp"
     from_port       = 22
     to_port         = 22
-    security_groups = [aws_security_group.bastion.id] #배스천 호스트에서만 접근 허용
+    security_groups = [aws_security_group.bastion.id] #사설망의 EC2 인스턴스에서 사용하는 SG (배스천 호스트에서만 접근 허용)
   }
 
   ingress {
@@ -145,7 +145,7 @@ resource "aws_security_group" "web" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  egress {
+  egress { 
     protocol    = "-1" #모든 프로토콜 허용
     from_port   = 0
     to_port     = 0
@@ -206,7 +206,7 @@ resource "aws_security_group" "efs" {
     protocol        = "tcp"
     from_port       = 2049
     to_port         = 2049
-    security_groups = [aws_security_group.web.id]
+    security_groups = [aws_security_group.web.id]  #EC2에서만 접근 가능하게 함(마운트를 위해)
   }
 
   egress {
