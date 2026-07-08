@@ -81,7 +81,9 @@ jobs:
       run: | 
         cd ansible-code
         ansible-playbook -i hosts_custom playbook/first_setting.yml -vvv
-
+      env:
+        ANSIBLE_GATHERING: explicit
+        ANSIBLE_INTERPRETER_PYTHON: /usr/bin/python3
 
 
 
