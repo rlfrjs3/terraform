@@ -38,27 +38,44 @@ jobs:
     - name: 6. 테라폼 output으로 추출한 EC2의 사설IP 확인 
       run: |
         BASTION_PUBLIC_IP=$(terraform output -raw bastionhost_public_ip)
-        EC2_PRIVATE_IP=$(terraform output -json ec2_private_ip | jq -r '.[]')
-
+        
+        #러너VM에 EC2 SSH 접속 비밀키를 넣고(비밀키는 깃헙 secrets에 미리 등록해놓음) 
         mkdir -p ~/.ssh
         echo "${{ secrets.AWS_EC2_PRIVATE_KEY }}" > ~/.ssh/ec2_private_key.pem
         chmod 600 ~/.ssh/ec2_private_key.pem
 
+        #러너VM 에서 앤서블 hosts에 호스트 정보 기입
         cat << EOF > ansible-code/hosts_custom
         [bastion]
         $BASTION_PUBLIC_IP ansible_host=$BASTION_PUBLIC_IP ansible_user=rocky ansible_ssh_private_key_file=$HOME/.ssh/ec2_private_key.pem
-
+        
         [ec2]
-        $EC2_PRIVATE_IP ansible_host=$EC2_PRIVATE_IP ansible_user=rocky ansible_ssh_private_key_file=$HOME/.ssh/ec2_private_key.pem
+        EOF
 
+
+        #EC2는 IP가 여러개이므로 while 문 돌려서 hosts에 기입
+        terraform output -json ec2_private_ip | jq -r '.[]' | while read -r ip
+        do
+          if [[ -n "$ip" ]]; then
+            echo "$ip ansible_host=$ip ansible_user=rocky ansible_ssh_private_key_file=$HOME/.ssh/ec2_private_key.pem" >> ansible-code/hosts_custom
+          fi
+        done
+
+        cat << EOF >> ansible-code/hosts_custom
+   
         [ec2:vars]
         ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q rocky@$BASTION_PUBLIC_IP -i $HOME/.ssh/ec2_private_key.pem -o StrictHostKeyChecking=no" -o StrictHostKeyChecking=no'
         EOF
+         
+        
 
+
+
+      #플레이북 hosts를 위에서 지정한 ec2로 지정
     - name: 7. 플레이북 실행
       run: | 
         cd ansible-code
-        ansible-playbook -i hosts_custom playbook/first_setting.yml
+        ansible-playbook -i hosts_custom playbook/first_setting.yml -vvv
 
 
 
