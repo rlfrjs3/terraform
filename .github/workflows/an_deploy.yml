@@ -37,12 +37,14 @@ jobs:
  
     - name: 6. 테라폼 output으로 추출한 EC2의 사설IP 확인 
       run: |
-        BASTION_PUBLIC_IP=$(terraform output -raw bastionhost_public_ip)
-        
         #러너VM에 EC2 SSH 접속 비밀키를 넣고(비밀키는 깃헙 secrets에 미리 등록해놓음) 
         mkdir -p ~/.ssh
         echo "${{ secrets.AWS_EC2_PRIVATE_KEY }}" > ~/.ssh/ec2_private_key.pem
         chmod 600 ~/.ssh/ec2_private_key.pem
+
+        #테라폼 output(배스천호스트 공인ip)  변수기입
+        BASTION_PUBLIC_IP=$(terraform output -raw bastionhost_public_ip)
+
 
         #러너VM 에서 앤서블 hosts에 호스트 정보 기입
         cat << EOF > ansible-code/hosts_custom
@@ -52,7 +54,6 @@ jobs:
         [ec2]
         EOF
 
-
         #EC2는 IP가 여러개이므로 while 문 돌려서 hosts에 기입
         terraform output -json ec2_private_ip | jq -r '.[]' | while read -r ip
         do
@@ -61,10 +62,11 @@ jobs:
           fi
         done
 
+        #Proxy를 통한 접속 
         cat << EOF >> ansible-code/hosts_custom
    
         [ec2:vars]
-        ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q rocky@$BASTION_PUBLIC_IP -i $HOME/.ssh/ec2_private_key.pem -o StrictHostKeyChecking=no" -o StrictHostKeyChecking=no'
+        ansible_ssh_common_args='-o ProxyJump=rocky@$BASTION_PUBLIC_IP -o StrictHostKeyChecking=no'
         EOF
          
         
