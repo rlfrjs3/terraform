@@ -67,13 +67,8 @@ jobs:
    
         [ec2:vars]
         ansible_user=rocky
-        ansible_ssh_private_key_file=$HOME/.ssh/ec2_private_key.pem
-        
-        # SSH 접속 시 호스트 키 검증을 아예 안 하도록 공통 옵션 지정
-        ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-        
-        # 징검다리가 될 배스천 호스트 지정 (앤서블이 내부적으로 깔끔하게 ProxyJump 명령어로 변환함)
-        ansible_ssh_proxy_executable='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p rocky@$BASTION_PUBLIC_IP -i $HOME/.ssh/ec2_private_key.pem'       
+        ansible_ssh_private_key_file=$HOME/.ssh/ec2_private_key.pem        
+        ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand="ssh -i $HOME/.ssh/ec2_private_key.pem -W %h:%p -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null rocky@$BASTION_PUBLIC_IP"'
         EOF
          
         
