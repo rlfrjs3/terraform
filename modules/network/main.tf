@@ -163,7 +163,7 @@ resource "aws_security_group" "bastion" {
     protocol    = "tcp"
     from_port   = 22
     to_port     = 22
-    cidr_blocks = ["106.246.242.226/32"] #사무실 공인IP에서만 접근 허용
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
