@@ -1,0 +1,53 @@
+name: 테라폼 배포로 생성된 EC2에 플레이북 배포
+
+
+#언제 작동할 것인가? -> 깃헙 사이트에서 [배포 버튼]을 누르면
+on:
+  workflow_dispatch:
+
+
+jobs: 
+  ansible-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1. 깃헙 테라폼 레포에 있는 코드를 러너VM에 다운로드   #현재 이 배포 파일이 살고 있는 '테라폼 저장소'의 코드를 먼저 컴퓨터로 다운로드합니다.
+      uses: actions/checkout@v4          #현재 CD 배포파일이 테라폼 코드 내에 있으므로 이렇게만 적어주면 됨
+
+    - name: 2. 깃헙 앤서블 레포에 있는 코드를 러너VM에 다운로드     #다른 저장소에 분리되어 있는 '앤서블 소스 코드'를 추가로 다운로드합니다!
+      uses: actions/checkout@v4
+      with:                            #앤서블 코드는 다른 레포에 있기 때문에 명시해줘야 함
+        repository: 'rlfrjs3/ansible'    #실제 깃헙 저장소의 레포이름 
+        path: 'ansible-code'             #러너VM에 코드를 저장할 가상 폴더 이름
+        token: ${{ secrets.ANSIBLE_REPO_TOKEN }}   #앤서블 레포에 있는 코드르 다운로드 하기 위해 테라폼 레포 secrets에 저장해 둔 깃헙 토큰을 명시해줘야 함 (깃헙 토큰은 모든 레포에서 동일하게 사용함)
+
+    - name: 2. AWS profile 인증  #AWS에 접근해서 현재 인프라 상태를 조회해야 하므로, 내 AWS 계정 정보로 로그인합니다.
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_STEPHANE }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_STEPHANE }}
+        aws-region: ap-northeast-2
+
+    - name: 3. 러너VM에 테라폼 설치      #테라폼의 '출력(Output)' 기능을 빌려와서 IP 주소들을 추출해야 하므로 테라폼 프로그램을 설치합니다.
+      uses: hashicorp/setup-terraform@v3
+
+    - name: 4. 테라폼 초기화 (init)     #테라폼의 현재 상태 기록 파일(State)을 읽기 위해 주방장(테라폼)을 준비시키는 초기화 단계입니다.
+      run: | 
+        terraform init         
+ 
+    - name: 5. 테라폼 output으로 추출한 EC2의 사설IP 확인 
+      run: |
+        BASTION_PUBLIC_IP=$(terraform output -raw bastionhost_public_ip)
+        EC2_PRIVATE_IP=$(terraform output -json ec2_private_ip | jq -r '.[]')
+
+        echo $BASTION_PUBLIC_IP
+        echo $EC2_PRIVATE_IP
+
+
+
+
+
+ 
+
+
+

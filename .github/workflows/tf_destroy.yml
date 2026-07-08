@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 1. 깃헙 저장소에서 코드를 러너VM에  가져오기 (Checkout)
+    - name: 1. 깃헙 테라폼 레포에 있는 코드를 러너VM에 다운로드 
       uses: actions/checkout@v4
 
     - name: 2. AWS profile 인증 
