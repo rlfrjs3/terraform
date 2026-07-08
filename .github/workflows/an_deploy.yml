@@ -66,7 +66,9 @@ jobs:
         cat << EOF >> ansible-code/hosts_custom
    
         [ec2:vars]
-        ansible_ssh_common_args='-o ProxyJump=rocky@$BASTION_PUBLIC_IP -o StrictHostKeyChecking=no'
+        ansible_user=rocky
+        ansible_ssh_private_key_file=$HOME/.ssh/ec2_private_key.pem
+        ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyJump="rocky@$BASTION_PUBLIC_IP -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"'
         EOF
          
         
