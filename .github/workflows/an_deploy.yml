@@ -21,27 +21,45 @@ jobs:
         path: 'ansible-code'             #러너VM에 코드를 저장할 가상 폴더 이름
         token: ${{ secrets.ANSIBLE_REPO_TOKEN }}   #앤서블 레포에 있는 코드르 다운로드 하기 위해 테라폼 레포 secrets에 저장해 둔 깃헙 토큰을 명시해줘야 함 (깃헙 토큰은 모든 레포에서 동일하게 사용함)
 
-    - name: 2. AWS profile 인증  #AWS에 접근해서 현재 인프라 상태를 조회해야 하므로, 내 AWS 계정 정보로 로그인합니다.
+    - name: 3. AWS profile 인증  #AWS에 접근해서 현재 인프라 상태를 조회해야 하므로, 내 AWS 계정 정보로 로그인합니다.
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_STEPHANE }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_STEPHANE }}
         aws-region: ap-northeast-2
 
-    - name: 3. 러너VM에 테라폼 설치      #테라폼의 '출력(Output)' 기능을 빌려와서 IP 주소들을 추출해야 하므로 테라폼 프로그램을 설치합니다.
+    - name: 4. 러너VM에 테라폼 설치      #테라폼의 '출력(Output)' 기능을 빌려와서 IP 주소들을 추출해야 하므로 테라폼 프로그램을 설치합니다.
       uses: hashicorp/setup-terraform@v3
 
-    - name: 4. 테라폼 초기화 (init)     #테라폼의 현재 상태 기록 파일(State)을 읽기 위해 주방장(테라폼)을 준비시키는 초기화 단계입니다.
+    - name: 5. 테라폼 초기화 (init)     #테라폼의 백엔드 S3에 접근해서 현재 상태 기록 파일(State)을 읽기 위해 주방장(테라폼)을 준비시키는 초기화 단계입니다.
       run: | 
         terraform init         
  
-    - name: 5. 테라폼 output으로 추출한 EC2의 사설IP 확인 
+    - name: 6. 테라폼 output으로 추출한 EC2의 사설IP 확인 
       run: |
         BASTION_PUBLIC_IP=$(terraform output -raw bastionhost_public_ip)
         EC2_PRIVATE_IP=$(terraform output -json ec2_private_ip | jq -r '.[]')
 
-        echo $BASTION_PUBLIC_IP
-        echo $EC2_PRIVATE_IP
+        mkdir -p ~/.ssh
+        echo "${{ secrets.AWS_EC2_PRIVATE_KEY }}" > ~/.ssh/ec2_private_key.pem
+        chmod 600 ~/.ssh/ec2_private_key.pem
+
+        cat << EOF > ansible-code/hosts_custom
+        [bastion]
+        $BASTION_PUBLIC_IP ansible_host=$BASTION_PUBLIC_IP ansible_user=rocky ansible_ssh_private_key_file=$HOME/.ssh/ec2_private_key.pem
+
+        [ec2]
+        $EC2_PRIVATE_IP ansible_host=$EC2_PRIVATE_IP ansible_user=rocky ansible_ssh_private_key_file=$HOME/.ssh/ec2_private_key.pem
+
+        [ec2:vars]
+        ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q rocky@$BASTION_PUBLIC_IP -i $HOME/.ssh/ec2_private_key.pem -o StrictHostKeyChecking=no" -o StrictHostKeyChecking=no'
+        EOF
+
+    - name: 7. 플레이북 실행
+      run: | 
+        cd ansible-code
+        ansible-playbook -i hosts_custom playbook/rockyscript/asp/main.yml
+
 
 
 
