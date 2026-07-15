@@ -8,10 +8,10 @@ output "bucket_name" {
   value       = module.s3.bucket_name
 }
 
-output "db_instance_endpoint" {
-  description = "RDS 인스턴스 엔드포인트"
-  value       = module.rds.db_instance_endpoint
-}
+#output "db_instance_endpoint" {
+#  description = "RDS 인스턴스 엔드포인트"
+#  value       = module.rds.db_instance_endpoint
+#}
 
 output "efs_dns_name" {
   description = "EFS 파일시스템 DNS 이름"
