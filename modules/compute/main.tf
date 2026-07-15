@@ -39,24 +39,32 @@ resource "aws_launch_template" "web" {
   }
   user_data = base64encode(<<EOT
 #!/bin/bash
-yum -y update && yum -y install httpd
-yum -y install amazon-efs-utils
+dnf -y update && dnf -y install httpd
+dnf -y install nfs-utils
 systemctl enable --now httpd
 echo "<h1>Welcome to My Web Server</h1>" > /var/www/html/index.html
 
 mkdir -p /data/efs
-echo "${aws_efs_file_system.web-efs.id}:/ /data/efs efs defaults,_netdev,nofail 0 0" >> /etc/fstab
-for i in {1..12}; do 
-  mount -a && break
-  echo "[$(date)] Retry $i: EFS not ready yet" >> /var/log/efs-mount.log
-  sleep 10 
-done 
+EFS_DNS="${aws_efs_file_system.web-efs.dns_name}"
 
-if mountpoint -q /data/efs; then
-  echo "[$(date)] EFS mount Successful" >> /var/log/efs-mount.log
-else
-  echo "[$(date)] EFS mount fail" >> /var/log/efs-mount.log
+if ! grep -q "/data/efs" /etc/fstab; then
+  echo "$EFS_DNS:/ /data/efs nfs4 defaults,_netdev,nofail 0 0" >> /etc/fstab
 fi
+
+for i in {1..12}; do
+    mount -a
+    if mountpoint -q /data/efs; then
+        echo "[$(date)] EFS mount Successful" >> /var/log/efs-mount.log
+        break
+    fi
+    echo "[$(date)] Retry $i: EFS not ready yet" >> /var/log/efs-mount.log
+    sleep 10
+done
+
+if ! mountpoint -q /data/efs; then
+    echo "[$(date)] EFS mount fail" >> /var/log/efs-mount.log
+fi
+
 EOT
   )
 
