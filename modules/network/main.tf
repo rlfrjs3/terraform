@@ -145,7 +145,7 @@ resource "aws_security_group" "web" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  egress { 
+  egress {
     protocol    = "-1" #모든 프로토콜 허용
     from_port   = 0
     to_port     = 0
@@ -206,7 +206,7 @@ resource "aws_security_group" "efs" {
     protocol        = "tcp"
     from_port       = 2049
     to_port         = 2049
-    security_groups = [aws_security_group.web.id]  #EC2에서만 접근 가능하게 함(마운트를 위해)
+    security_groups = [aws_security_group.web.id] #EC2에서만 접근 가능하게 함(마운트를 위해)
   }
 
   egress {

@@ -27,6 +27,16 @@ resource "aws_launch_template" "web" {
   #  iam_instance_profile { name = var.instance_profile }
   depends_on = [aws_efs_mount_target.web-efs-mt]
 
+  block_device_mappings {
+    device_name = "/dev/nvme0n1"
+
+    ebs {
+      volume_size           = 50
+      volume_type           = "gp3"
+      delete_on_termination = true
+      encrypted             = true
+    }
+  }
   user_data = base64encode(<<EOT
 #!/bin/bash
 yum -y update && yum -y install httpd
