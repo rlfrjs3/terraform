@@ -30,12 +30,12 @@ module "s3" {
   project_name = var.project_name
 }
 
-module "rds" {
-  source             = "./modules/rds"
-  project_name       = var.project_name
-  private_subnet_ids = module.network.private_subnet_ids
-  rds_sg_id          = module.network.rds_sg_id
-}
+#module "rds" {
+#  source             = "./modules/rds"
+#  project_name       = var.project_name
+#  private_subnet_ids = module.network.private_subnet_ids
+#  rds_sg_id          = module.network.rds_sg_id
+#}
 
 module "cloudfront" {
   source = "./modules/cloudfront"
