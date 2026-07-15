@@ -77,6 +77,7 @@ jobs:
 
 
       #플레이북 hosts를 위에서 지정한 ec2로 지정
+      #Ubuntu 러너VM 에 설치된 앤서블 버전에 맞는 파이썬 버전이 3.9이기 때문에 원격 노드들에 설치 진행
     - name: 7. 플레이북 실행
       run: | 
         cd ansible-code
