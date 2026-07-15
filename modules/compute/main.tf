@@ -81,7 +81,7 @@ resource "aws_autoscaling_group" "web_asg" {
   vpc_zone_identifier       = var.private_subnet_ids           #프라이빗 서브넷에만 생성
   health_check_type         = "ELB"                            #웹서버 80포트 응답 없으면 삭제하고 재생성
   health_check_grace_period = 300
-  #instance_refresh { strategy = "Rolling" }              #시작템플릿 설정이 바뀐다면 기존 인스턴스 종료하고 다시 생성
+  instance_refresh { strategy = "Rolling" }              #시작템플릿 설정이 바뀐다면 기존 인스턴스 종료하고 다시 생성
   launch_template {
     id      = aws_launch_template.web.id
     version = "$Latest"
