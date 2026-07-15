@@ -12,7 +12,7 @@ private_subnet_cidrs = ["10.0.101.0/24", "10.0.102.0/24"]
 
 #EC2
 ami_id        = "ami-0516c1f2c7053c6b1" #Rocky Linux8 (Official)
-instance_type = "t3.small"
+instance_type = "t3.medium"
 key_name      = "iac_keypair"
 
 #route53

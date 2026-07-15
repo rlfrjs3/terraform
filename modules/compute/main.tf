@@ -28,7 +28,7 @@ resource "aws_launch_template" "web" {
   depends_on = [aws_efs_mount_target.web-efs-mt]
 
   block_device_mappings {
-    device_name = "/dev/nvme0n1"
+    device_name = "/dev/sda1"
 
     ebs {
       volume_size           = 50
