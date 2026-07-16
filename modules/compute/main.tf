@@ -39,7 +39,6 @@ resource "aws_launch_template" "web" {
   }
   user_data = base64encode(<<EOT
 #!/bin/bash
-dnf -y update 
 dnf -y install httpd nfs-utils
 echo "<h1>Welcome to My Web Server</h1>" > /var/www/html/index.html
 systemctl enable --now httpd
