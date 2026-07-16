@@ -81,7 +81,7 @@ jobs:
     - name: 7. 플레이북 실행
       run: | 
         cd ansible-code
-        ansible-playbook -i hosts_custom playbook/first_setting.yml -vvv --flush-cache -e "ansible_python_interpreter=/usr/bin/python3.9"
+        ansible-playbook -i hosts_custom playbook/first_setting.yml -vvv --flush-cache -e "ansible_python_interpreter=/usr/bin/python3.9" --vault-password-file=decrypt.txt
       env:
         ANSIBLE_GATHERING: explicit
 
