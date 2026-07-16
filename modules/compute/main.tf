@@ -73,12 +73,12 @@ EOT
 resource "aws_autoscaling_group" "web_asg" {
 
   target_group_arns         = [aws_lb_target_group.web_tg.arn] #ALB 타겟그룹과 연결
-  desired_capacity          = 3                                #평상시 갯수
-  max_size                  = 3                                #최대 갯수
-  min_size                  = 3                                #최소 갯수
+  desired_capacity          = 2                                #평상시 갯수
+  max_size                  = 2                                #최대 갯수
+  min_size                  = 2                                #최소 갯수
   vpc_zone_identifier       = var.private_subnet_ids           #프라이빗 서브넷에만 생성
   health_check_type         = "ELB"                            #웹서버 80포트 응답 없으면 삭제하고 재생성
-  health_check_grace_period = 300
+  health_check_grace_period = 600
   instance_refresh { strategy = "Rolling" } #시작템플릿 설정이 바뀐다면 기존 인스턴스 종료하고 다시 생성
   launch_template {
     id      = aws_launch_template.web.id
