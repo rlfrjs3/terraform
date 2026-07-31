@@ -8,11 +8,14 @@ on:
 
 jobs: 
   terraform-destroy:
-    runs-on: ubuntu-latest
+    #runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - name: 1. 깃헙 테라폼 레포에 있는 코드를 러너VM에 다운로드 
       uses: actions/checkout@v4
+      with:
+        path: terraform
 
     - name: 2. AWS profile 인증 
       uses: aws-actions/configure-aws-credentials@v4
