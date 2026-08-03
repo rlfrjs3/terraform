@@ -14,14 +14,12 @@ jobs:
     steps:
     - name: 1. 깃헙 테라폼 레포에 있는 코드를 러너VM에 다운로드 
       uses: actions/checkout@v4
-      with:
-        path: terraform
 
     - name: 2. AWS profile 인증 
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_GEON }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_GEON }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_STEPHANE }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_STEPHANE }}
         aws-region: ap-northeast-2
 
     - name: 3. 러너VM에 테라폼 설치

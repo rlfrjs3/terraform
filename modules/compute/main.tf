@@ -65,8 +65,8 @@ systemctl enable --now httpd
 EOT
   )
 
-  tags = { 
-    Name = "${var.project_name}-web-server" 
+  tags = {
+    Name = "${var.project_name}-web-server"
     Role = "webserver"
   }
 }
@@ -89,12 +89,12 @@ resource "aws_autoscaling_group" "web_asg" {
   tag {
     key                 = "Name"
     value               = "${var.project_name}-web-server"
-    propagate_at_launch = true    
+    propagate_at_launch = true
   }
 
-  tag { 
-    key			= "Role"
-    value		= "webserver"
+  tag {
+    key                 = "Role"
+    value               = "webserver"
     propagate_at_launch = true
   }
 }
@@ -176,10 +176,10 @@ resource "aws_instance" "bastion" {
 
   associate_public_ip_address = true
 
-  tags = { 
-    Name = "${var.project_name}-bastionhost" 
+  tags = {
+    Name = "${var.project_name}-bastionhost"
     Role = "bastionhost"
-  }      
+  }
 }
 
 
