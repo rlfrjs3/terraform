@@ -39,6 +39,12 @@ resource "aws_launch_template" "web" {
   }
   user_data = base64encode(<<EOT
 #!/bin/bash
+mkdir -p /home/rocky/.ssh
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBoSZdwmsMYzjzJ/+u8WDhX4fCs+1w4LM067cMNRnlXo ansible-root-key" >> /home/rocky/.ssh/authorized_keys
+chown -R rocky:rocky /home/rocky/.ssh
+chmod 700 /home/rocky/.ssh
+chmod 600 /home/rocky/.ssh/authorized_keys
+
 dnf -y install httpd nfs-utils
 echo "<h1>Welcome to My Web Server</h1>" > /var/www/html/index.html
 systemctl enable --now httpd
@@ -175,6 +181,16 @@ resource "aws_instance" "bastion" {
   security_groups = [var.bastion_sg_id]
 
   associate_public_ip_address = true
+
+  user_data_base64 = base64encode(<<EOT
+#!/bin/bash
+mkdir -p /home/rocky/.ssh
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBoSZdwmsMYzjzJ/+u8WDhX4fCs+1w4LM067cMNRnlXo ansible-root-key" >> /home/rocky/.ssh/authorized_keys
+chown -R rocky:rocky /home/rocky/.ssh
+chmod 700 /home/rocky/.ssh
+chmod 600 /home/rocky/.ssh/authorized_keys
+EOT
+  )
 
   tags = {
     Name = "${var.project_name}-bastionhost"
