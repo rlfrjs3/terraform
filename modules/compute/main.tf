@@ -45,9 +45,9 @@ chown -R rocky:rocky /home/rocky/.ssh
 chmod 700 /home/rocky/.ssh
 chmod 600 /home/rocky/.ssh/authorized_keys
 
-dnf -y install nfs-utils
-#echo "<h1>Welcome to My Web Server</h1>" > /var/www/html/index.html
-#systemctl enable --now httpd
+dnf -y install httpd nfs-utils
+echo "<h1>Welcome to My Web Server</h1>" > /var/www/html/index.html
+systemctl enable --now httpd
 
 (
 	mkdir -p /data/efs
