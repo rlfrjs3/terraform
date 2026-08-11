@@ -120,16 +120,9 @@ resource "aws_route_table_association" "private" {
 
 
 ###<Security Group>
-#WEB 보안그룹 
-resource "aws_security_group" "web" {
+#ALB 보안그룹
+resource "aws_security_group" "alb" {
   vpc_id = aws_vpc.tf-vpc.id
-
-  ingress {
-    protocol        = "tcp"
-    from_port       = 22
-    to_port         = 22
-    security_groups = [aws_security_group.bastion.id] #사설망의 EC2 인스턴스에서 사용하는 SG (배스천 호스트에서만 접근 허용)
-  }
 
   ingress {
     protocol    = "tcp"
@@ -146,6 +139,39 @@ resource "aws_security_group" "web" {
   }
 
   egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+#WEB 보안그룹 
+resource "aws_security_group" "web" {
+  vpc_id = aws_vpc.tf-vpc.id
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = 22
+    to_port         = 22
+    security_groups = [aws_security_group.bastion.id] #사설망의 EC2 인스턴스에서 사용하는 SG (배스천 호스트에서만 접근 허용)
+  }
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = 80
+    to_port         = 80
+    security_groups = [aws_security_group.alb.id]
+  }
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = 443
+    to_port         = 443
+    security_groups = [aws_security_group.alb.id]
+  }
+
+  egress {
     protocol    = "-1" #모든 프로토콜 허용
     from_port   = 0
     to_port     = 0
@@ -159,11 +185,20 @@ resource "aws_security_group" "web" {
 resource "aws_security_group" "bastion" {
   vpc_id = aws_vpc.tf-vpc.id
 
+  #Ansible 프록시 경유
   ingress {
     protocol    = "tcp"
     from_port   = 22
     to_port     = 22
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["121.78.197.103/32"] #러너 서버
+  }
+
+  #Prometheus + Grafana 
+  ingress {
+    protocol    = "tcp"
+    from_port   = 9100
+    to_port     = 9100
+    cidr_blocks = ["121.78.197.103/32"] #러너 서버
   }
 
   egress {

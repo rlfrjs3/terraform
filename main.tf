@@ -17,6 +17,7 @@ module "compute" {
   vpc_id             = module.network.vpc_id
   public_subnet_ids  = module.network.public_subnet_ids
   private_subnet_ids = module.network.private_subnet_ids
+  alb_sg_id          = module.network.alb_sg_id
   web_sg_id          = module.network.web_sg_id
   efs_sg_id          = module.network.efs_sg_id
   bastion_sg_id      = module.network.bastion_sg_id

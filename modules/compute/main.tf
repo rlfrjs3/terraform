@@ -131,7 +131,7 @@ data "aws_instances" "asg_instances" {
 resource "aws_lb" "web_alb" {
   name               = "${var.project_name}-alb"
   load_balancer_type = "application"
-  security_groups    = [var.web_sg_id]
+  security_groups    = [var.alb_sg_id]
   subnets            = var.public_subnet_ids
 
   tags = { Name = "${var.project_name}-alb" }
