@@ -185,6 +185,14 @@ resource "aws_security_group" "web" {
 resource "aws_security_group" "bastion" {
   vpc_id = aws_vpc.tf-vpc.id
 
+  #사무실 IP
+  ingress {
+    protocol	= "tcp"
+    from_port	= 22
+    to_port	= 22
+    cidr_blocks = ["106.246.242.226/32"] 
+  }
+
   #Ansible 프록시 경유
   ingress {
     protocol    = "tcp"
