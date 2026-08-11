@@ -40,7 +40,7 @@ resource "aws_subnet" "private" {
 resource "aws_internet_gateway" "tf-igw" {
   vpc_id = aws_vpc.tf-vpc.id
 
-  tags = { Name = "${var.project_name}-igw}" }
+  tags = { Name = "${var.project_name}-igw" }
 }
 
 
