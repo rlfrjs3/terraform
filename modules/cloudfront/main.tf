@@ -33,7 +33,7 @@ resource "aws_cloudfront_distribution" "tf-cloudfront" {
     minimum_protocol_version = "TLSv1.2_2019"
   }
 
-  logging_config { #cloudfront 로깅 설정(S3 버킷으로 전달)
+  logging_config { #cloudfront legacy  로깅 설정(S3 버킷으로 전달) -> S3 버킷의 ACL이 반드시 활성화 되어있어야 함
     bucket          = var.bucket_domain_name
     prefix          = "cloudfront-log/" #S3 버킷 내 로그가 쌓이는 경로
     include_cookies = false             #쿠키 정보는 로그에 포함되지 않음

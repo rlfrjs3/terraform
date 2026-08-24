@@ -10,8 +10,8 @@ terraform {
 
 
   backend "s3" {
-    bucket  = "tf-project-backend"
-    key     = "terraform-project/stephane/terraform.tfstate"
+    bucket  = "firstmall-project-backend"
+    key     = "stephane/terraform.tfstate"
     region  = "ap-northeast-2"
     encrypt = true
     #dynamodb_table = "" 

@@ -1,7 +1,7 @@
 ###value 설정파일 - 해당 파일의 값들만 수정하면 코드 재사용이 가능하도록
 
 #tag값
-project_name = "tf-project-1"
+project_name = "firstmall-project"
 
 #VPC
 region               = "ap-northeast-2"

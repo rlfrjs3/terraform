@@ -51,19 +51,16 @@ resource "aws_internet_gateway" "tf-igw" {
 #NAT Gateway가 사용할 공인 eip 할당
 resource "aws_eip" "nat_eip" {
   domain = "vpc"
-  count = length(var.availability_zones)
 
-  tags = { Name = "${var.project_name}-nat_eip-${count.index + 1}" }
+  tags = { Name = "${var.project_name}-nat_eip" }
 }
 
 #NAT Gateway 생성
 resource "aws_nat_gateway" "nat_gateway" {
-  count		= length(var.availability_zones)
+  allocation_id = aws_eip.nat_eip.id
+  subnet_id     = aws_subnet.public[0].id #퍼블릭 서브넷에 배치
 
-  allocation_id = aws_eip.nat_eip[count.index].id
-  subnet_id     = aws_subnet.public[count.index].id #퍼블릭 서브넷에 배치
-
-  tags = { Name = "${var.project_name}-nat_gateway-${count.index + 1}" }
+  tags = { Name = "${var.project_name}-nat_gateway" }
 
   depends_on = [aws_internet_gateway.tf-igw] #igw가 있어야 생성될 수 있다는 의존성 명시
 }
@@ -100,21 +97,20 @@ resource "aws_route_table_association" "public" {
 
 #프라이빗 라우팅테이블 (외부로 나갈때는 NAT GW를 통하도록 설정)
 resource "aws_route_table" "private" {
-  count  = length(var.availability_zones)
   vpc_id = aws_vpc.tf-vpc.id
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat_gateway[count.index].id
+    nat_gateway_id = aws_nat_gateway.nat_gateway.id
   }
 
-  tags = { Name = "${var.project_name}-private-rt-${count.index + 1}" }
+  tags = { Name = "${var.project_name}-private-rt" }
 }
 
 #프라이빗 서브넷에 각 프라이빗 라우팅테이블 연결
 resource "aws_route_table_association" "private" {
   count          = length(aws_subnet.private)
   subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private[count.index].id
+  route_table_id = aws_route_table.private.id
 }
 
 
