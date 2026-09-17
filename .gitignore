@@ -2,6 +2,5 @@
 *.tfstate
 *.tfstate.backup
 *.tfplan
-.terraform.lock.hcl
 *.log
 modules/ssm/

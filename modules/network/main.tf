@@ -48,7 +48,7 @@ resource "aws_internet_gateway" "tf-igw" {
 
 
 ###<NAT Gateway>
-#NAT Gateway가 사용할 공인 eip 할당
+#NAT Gateway가 사용할 공인 eip 할당 - AZ마다 1개씩 생성
 resource "aws_eip" "nat_eip" {
   domain = "vpc"
   count = length(var.availability_zones)
@@ -56,7 +56,7 @@ resource "aws_eip" "nat_eip" {
   tags = { Name = "${var.project_name}-nat_eip-${count.index + 1}" }
 }
 
-#NAT Gateway 생성
+#NAT Gateway 생성 - 퍼블릭 서브넷마다 1개씩 생성
 resource "aws_nat_gateway" "nat_gateway" {
   count		= length(var.availability_zones)
 
@@ -98,7 +98,7 @@ resource "aws_route_table_association" "public" {
 }
 
 
-#프라이빗 라우팅테이블 (외부로 나갈때는 NAT GW를 통하도록 설정)
+#프라이빗 라우팅테이블 (외부로 나갈때는 각각의 AZ에 있는 NAT GW를 통하도록 설정)
 resource "aws_route_table" "private" {
   count  = length(var.availability_zones)
   vpc_id = aws_vpc.tf-vpc.id
